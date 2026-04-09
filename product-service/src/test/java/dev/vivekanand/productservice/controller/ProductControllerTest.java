@@ -3,18 +3,18 @@ package dev.vivekanand.productservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.vivekanand.productservice.dto.ProductRequest;
 import dev.vivekanand.productservice.dto.ProductResponse;
+import dev.vivekanand.productservice.exception.GlobalExceptionHandler;
 import dev.vivekanand.productservice.exception.ResourceNotFoundException;
 import dev.vivekanand.productservice.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -28,16 +28,14 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@org.springframework.boot.test.context.SpringBootTest
-@org.springframework.test.context.ActiveProfiles("test")
-@org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-@org.springframework.context.annotation.Import(dev.vivekanand.productservice.exception.GlobalExceptionHandler.class)
+@WebMvcTest(ProductController.class)
+@Import(GlobalExceptionHandler.class)
 class ProductControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private ProductService service;
 
     @Autowired
@@ -56,6 +54,17 @@ class ProductControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("iPhone"));
+    }
+
+    @Test
+    void create_ShouldReturnBadRequest_WhenSkuIsLowercase() throws Exception {
+        ProductRequest request = new ProductRequest("iPhone", "Apple", new BigDecimal("999"), "ip15");
+
+        mockMvc.perform(post("/api/v1/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages[0]").value("sku: SKU must be alphanumeric with dashes/underscores only and uppercase"));
     }
 
     @Test

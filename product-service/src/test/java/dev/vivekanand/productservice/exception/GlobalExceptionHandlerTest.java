@@ -2,7 +2,6 @@ package dev.vivekanand.productservice.exception;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -48,12 +47,12 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void handleBadRequest_ShouldReturn409() {
-        DataIntegrityViolationException ex = new DataIntegrityViolationException("Conflict");
+        DuplicateSkuException ex = new DuplicateSkuException("SKU-123");
         ResponseEntity<ApiErrorResponse> response = handler.handleBadRequest(ex, webRequest);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("Conflict", response.getBody().messages().get(0));
+        assertEquals("SKU already exists: SKU-123", response.getBody().messages().get(0));
     }
 
     @Test

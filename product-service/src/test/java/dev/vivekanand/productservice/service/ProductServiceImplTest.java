@@ -2,6 +2,7 @@ package dev.vivekanand.productservice.service;
 
 import dev.vivekanand.productservice.dto.ProductRequest;
 import dev.vivekanand.productservice.dto.ProductResponse;
+import dev.vivekanand.productservice.exception.DuplicateSkuException;
 import dev.vivekanand.productservice.exception.ResourceNotFoundException;
 import dev.vivekanand.productservice.model.Product;
 import dev.vivekanand.productservice.repository.ProductRepository;
@@ -10,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -54,7 +54,7 @@ class ProductServiceImplTest {
         ProductRequest request = new ProductRequest("P1", "D1", BigDecimal.TEN, "S1");
         when(repository.existsBySku("S1")).thenReturn(true);
 
-        assertThrows(DataIntegrityViolationException.class, () -> service.create(request));
+        assertThrows(DuplicateSkuException.class, () -> service.create(request));
         verify(repository, never()).save(any());
     }
 
@@ -121,7 +121,7 @@ class ProductServiceImplTest {
         when(repository.findById(1L)).thenReturn(Optional.of(existing));
         when(repository.existsBySku("S2")).thenReturn(true);
 
-        assertThrows(DataIntegrityViolationException.class, () -> service.update(1L, request));
+        assertThrows(DuplicateSkuException.class, () -> service.update(1L, request));
         verify(repository, never()).save(any());
     }
 

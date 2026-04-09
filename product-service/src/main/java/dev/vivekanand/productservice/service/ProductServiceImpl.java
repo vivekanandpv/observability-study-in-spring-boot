@@ -2,10 +2,10 @@ package dev.vivekanand.productservice.service;
 
 import dev.vivekanand.productservice.dto.ProductRequest;
 import dev.vivekanand.productservice.dto.ProductResponse;
+import dev.vivekanand.productservice.exception.DuplicateSkuException;
 import dev.vivekanand.productservice.exception.ResourceNotFoundException;
 import dev.vivekanand.productservice.model.Product;
 import dev.vivekanand.productservice.repository.ProductRepository;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse create(ProductRequest request) {
         if (repository.existsBySku(request.sku())) {
-            throw new DataIntegrityViolationException("SKU already exists: " + request.sku());
+            throw new DuplicateSkuException(request.sku());
         }
         Product entity = ProductMapper.toEntity(request);
         Product saved = repository.save(entity);
@@ -51,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found: id=" + id));
         // enforce SKU uniqueness when changed
         if (!product.getSku().equals(request.sku()) && repository.existsBySku(request.sku())) {
-            throw new DataIntegrityViolationException("SKU already exists: " + request.sku());
+            throw new DuplicateSkuException(request.sku());
         }
         ProductMapper.updateEntity(product, request);
         Product saved = repository.save(product);

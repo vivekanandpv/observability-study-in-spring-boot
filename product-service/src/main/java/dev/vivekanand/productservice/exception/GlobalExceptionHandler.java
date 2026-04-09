@@ -1,6 +1,5 @@
 package dev.vivekanand.productservice.exception;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -68,7 +67,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, DataIntegrityViolationException.class})
+    @ExceptionHandler({IllegalArgumentException.class, DuplicateSkuException.class})
     public ResponseEntity<ApiErrorResponse> handleBadRequest(RuntimeException ex, WebRequest request) {
         ApiErrorResponse body = new ApiErrorResponse(
                 HttpStatus.CONFLICT.value(),

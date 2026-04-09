@@ -1,9 +1,11 @@
 package dev.vivekanand.productservice.repository;
 
+import dev.vivekanand.productservice.config.JpaAuditingConfig;
 import dev.vivekanand.productservice.model.Product;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
@@ -12,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Import(JpaAuditingConfig.class)
 class ProductRepositoryTest {
 
     @Autowired
