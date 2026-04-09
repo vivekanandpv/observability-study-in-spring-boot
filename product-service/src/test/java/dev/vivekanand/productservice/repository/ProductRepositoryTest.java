@@ -31,6 +31,7 @@ class ProductRepositoryTest {
         Product saved = repository.save(p);
 
         assertNotNull(saved.getId());
+        assertNotNull(saved.getCreatedAt());
         assertTrue(repository.findById(saved.getId()).isPresent());
     }
 

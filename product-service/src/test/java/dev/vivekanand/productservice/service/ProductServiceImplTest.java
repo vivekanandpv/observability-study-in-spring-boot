@@ -105,12 +105,12 @@ class ProductServiceImplTest {
 
     @Test
     void delete_ShouldCallRepository() {
-        when(repository.existsById(1L)).thenReturn(true);
-        doNothing().when(repository).deleteById(1L);
+        Product product = Product.builder().id(1L).name("P1").sku("S1").build();
+        when(repository.findById(1L)).thenReturn(Optional.of(product));
 
         service.delete(1L);
 
-        verify(repository).deleteById(1L);
+        verify(repository).delete(product);
     }
 
     @Test
@@ -142,7 +142,7 @@ class ProductServiceImplTest {
 
     @Test
     void delete_ShouldThrowException_WhenNotFound() {
-        when(repository.existsById(1L)).thenReturn(false);
+        when(repository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> service.delete(1L));
     }
